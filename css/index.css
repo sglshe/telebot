@@ -110,9 +110,11 @@ h1, h2, h3, h4 {
 
 .app {
   width: 100vw;
-  height: 100vh;
+  height: 100%;
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .screen {
@@ -123,9 +125,11 @@ h1, h2, h3, h4 {
   bottom: 0;
   display: none;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch;
   animation: fadeIn 0.4s ease;
   padding: 1rem;
+  padding-bottom: 90px;
 }
 
 .screen.active {
@@ -503,9 +507,8 @@ select.input-field option {
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  padding-bottom: 5rem;
+  min-height: 100%;
+  padding-bottom: 120px;
 }
 
 .dash-header {

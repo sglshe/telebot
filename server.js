@@ -11,11 +11,6 @@ const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, '.tracker-data.json');
 
 function loadData() {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      return JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    }
-  } catch (e) { console.error('[DB] Load error:', e.message); }
   return { links: {}, visitors: {} };
 }
 
