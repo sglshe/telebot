@@ -45,8 +45,10 @@ app.post('/api/create-link', (req, res) => {
   db.visitors[id] = [];
   saveData();
 
-  // The tracking URL is on THIS server
-  const trackUrl = `${req.protocol}://${req.get('host')}/t/${id}`;
+  // The tracking URL on public host (Render / Custom Domain)
+  const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  const trackUrl = `${proto}://${host}/t/${id}`;
 
   console.log(`[TRACK] Created link: ${trackUrl} -> ${destination}`);
 
@@ -193,7 +195,7 @@ function parseUserAgent(ua) {
 // ── Serve static files (frontend) ─────────────────────────
 app.use(express.static(path.join(__dirname)));
 
-app.listen(PORT, () => {
-  console.log(`[ANTICHRIST] Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`[ANTICHRIST] Server active on port ${PORT} (0.0.0.0)`);
   console.log(`[ANTICHRIST] ${Object.keys(db.links).length} existing links loaded`);
 });
