@@ -190,7 +190,22 @@ function parseUserAgent(ua) {
 // ── Serve static files (frontend) ─────────────────────────
 app.use(express.static(path.join(__dirname)));
 
+// ── Healthcheck / Keep-alive endpoint ────────────────────
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`[ANTICHRIST] Server active on port ${PORT} (0.0.0.0)`);
   console.log(`[ANTICHRIST] ${Object.keys(db.links).length} existing links loaded`);
+
+  // Self-ping to keep Render awake (every 4 minutes)
+  const PING_INTERVAL = 4 * 60 * 1000;
+  const selfUrl = process.env.RENDER_EXTERNAL_URL || 'https://telebot-kcqy.onrender.com';
+
+  setInterval(() => {
+    fetch(`${selfUrl}/healthz`)
+      .then(res => console.log(`[KEEP-ALIVE] Ping sent to ${selfUrl} (${res.status})`))
+      .catch(err => console.log(`[KEEP-ALIVE] Ping error: ${err.message}`));
+  }, PING_INTERVAL);
 });
