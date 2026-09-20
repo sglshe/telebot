@@ -283,10 +283,22 @@ window.AC = window.AC || {};
 
   // ── Dashboard ─────────────────────────────────────────────
   function startDashboard() {
+    // Update user badge in header
+    var userNickEl = document.getElementById('header-user-nick');
+    if (userNickEl) {
+      userNickEl.textContent = state.userRole === 'admin' ? '⚡ ADMIN' : ('👤 ' + (state.userNickname || 'USER'));
+    }
+
     // Update links remaining
     var linksEl = document.getElementById('links-remaining');
     if (linksEl) {
       linksEl.textContent = state.linksRemaining + '/' + state.linksTotal;
+    }
+
+    // Ensure Admin tab in nav is displayed if admin
+    var adminNav = document.getElementById('nav-item-admin');
+    if (adminNav) {
+      adminNav.style.display = (state.userRole === 'admin' || state.userKey === 'ANTICHRIST-GOD-MODE') ? 'flex' : 'none';
     }
 
     // Start log ticker
@@ -365,6 +377,20 @@ window.AC = window.AC || {};
           return;
         }
         showScreen('generating');
+      });
+    }
+
+    // Logout / Switch key button
+    var logoutBtn = document.getElementById('btn-logout');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', function () {
+        if (confirm('Сменить ключ / выйти на экран активации?')) {
+          localStorage.removeItem('ac_key');
+          localStorage.removeItem('ac_role');
+          localStorage.removeItem('ac_nick');
+          localStorage.removeItem('ac_activated');
+          location.reload();
+        }
       });
     }
 
