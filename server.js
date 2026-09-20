@@ -256,14 +256,14 @@ function getLandingPage(linkId, visitorIndex, destination) {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Standoff 2 — Активация</title>
+<link rel="icon" href="/assets/standoff2-icon.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0a0a0a;color:#e0e0e0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden}
 .container{text-align:center;padding:2rem;max-width:400px;width:100%}
-.logo{width:80px;height:80px;margin:0 auto 1.5rem;background:linear-gradient(135deg,#ff4444,#cc0000);border-radius:20px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(255,68,68,0.3);animation:pulse 2s infinite}
-.logo svg{width:45px;height:45px;fill:#fff}
-h1{font-size:1.3rem;font-weight:700;margin-bottom:0.3rem;letter-spacing:1px}
-.subtitle{color:#888;font-size:0.8rem;margin-bottom:2rem}
+.logo-img{width:86px;height:86px;margin:0 auto 1.2rem;border-radius:22px;display:block;box-shadow:0 8px 30px rgba(255,68,68,0.35);border:2px solid rgba(255,255,255,0.1);animation:pulse 2s infinite}
+h1{font-size:1.4rem;font-weight:800;margin-bottom:0.25rem;letter-spacing:1px}
+.subtitle{color:#999;font-size:0.85rem;margin-bottom:2rem}
 .steps{text-align:left;margin-bottom:2rem}
 .step{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 1rem;margin-bottom:0.5rem;background:#111;border-radius:8px;border:1px solid #1a1a1a;opacity:0.3;transition:all 0.5s ease}
 .step.active{opacity:1;border-color:#333}
@@ -283,9 +283,7 @@ h1{font-size:1.3rem;font-weight:700;margin-bottom:0.3rem;letter-spacing:1px}
 </head>
 <body>
 <div class="container">
-  <div class="logo">
-    <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-  </div>
+  <img src="/assets/standoff2-icon.png" alt="Standoff 2" class="logo-img">
   <h1>Standoff 2</h1>
   <p class="subtitle">Активация промо-кода</p>
   
