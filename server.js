@@ -24,7 +24,26 @@ let db = loadData();
 
 // ── Middleware ─────────────────────────────────────────────
 app.use(express.json());
-app.set('trust proxy', true); // for real IP behind reverse proxy
+app.set('trust proxy', true);
+
+// Block main app on standoff2 subdomain — only tracking links work there
+app.use((req, res, next) => {
+  const host = (req.headers['x-forwarded-host'] || req.get('host') || '').toLowerCase();
+  const isStandoffDomain = host.includes('standoff2');
+
+  if (isStandoffDomain) {
+    // Allow tracking links (/:id) and API endpoints
+    if (req.path.startsWith('/api/') || req.path === '/healthz') {
+      return next();
+    }
+    // Root path on standoff2 subdomain → redirect to real site
+    if (req.path === '/' || req.path === '/index.html') {
+      return res.redirect('https://standoff2.com');
+    }
+    // Everything else (tracking IDs) → pass through
+  }
+  next();
+});
 
 // ── API: Create tracking link ─────────────────────────────
 app.post('/api/create-link', (req, res) => {
