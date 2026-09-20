@@ -7,11 +7,38 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ── Data Storage (persists to JSON file) ──────────────────
+// ── Data Storage ──────────────────────────────────────────
 const DATA_FILE = path.join(__dirname, '.tracker-data.json');
+const ADMIN_KEY = 'ANTICHRIST-GOD-MODE';
+
+function generateKeys(count) {
+  const keys = {};
+  for (let i = 0; i < count; i++) {
+    const key = 'AC-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+    keys[key] = { used: false, usedBy: null, usedAt: null };
+  }
+  return keys;
+}
 
 function loadData() {
-  return { links: {}, visitors: {} };
+  try {
+    if (fs.existsSync(DATA_FILE)) {
+      const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+      // Ensure all fields exist
+      if (!data.keys) data.keys = generateKeys(50);
+      if (!data.users) data.users = {};
+      if (!data.links) data.links = {};
+      if (!data.visitors) data.visitors = {};
+      return data;
+    }
+  } catch (e) { console.error('[DB] Load error:', e.message); }
+  // First boot — generate 50 keys
+  return {
+    keys: generateKeys(50),
+    users: {},
+    links: {},
+    visitors: {}
+  };
 }
 
 function saveData() {
@@ -21,6 +48,7 @@ function saveData() {
 }
 
 let db = loadData();
+saveData(); // persist generated keys on first boot
 
 // ── Middleware ─────────────────────────────────────────────
 app.use(express.json());
@@ -45,32 +73,165 @@ app.use((req, res, next) => {
   next();
 });
 
+// ── API: Auth — validate key ──────────────────────────────
+app.post('/api/auth', (req, res) => {
+  const { key } = req.body;
+  if (!key) return res.json({ success: false, error: 'no_key' });
+
+  // Admin key
+  if (key === ADMIN_KEY) {
+    return res.json({ success: true, role: 'admin', nickname: 'ADMIN' });
+  }
+
+  // Check if key exists and is already used (returning user)
+  if (db.keys[key] && db.keys[key].used) {
+    const user = db.users[db.keys[key].usedBy];
+    return res.json({ success: true, role: 'user', nickname: user ? user.nickname : null, needsNickname: false });
+  }
+
+  // Check if key exists and unused
+  if (db.keys[key] && !db.keys[key].used) {
+    return res.json({ success: true, role: 'user', nickname: null, needsNickname: true });
+  }
+
+  return res.json({ success: false, error: 'invalid_key' });
+});
+
+// ── API: Register — set nickname after key validation ─────
+app.post('/api/register', (req, res) => {
+  const { key, nickname } = req.body;
+  if (!key || !nickname) return res.json({ success: false, error: 'missing_fields' });
+
+  if (key === ADMIN_KEY) {
+    return res.json({ success: true, role: 'admin', nickname: 'ADMIN' });
+  }
+
+  if (!db.keys[key] || db.keys[key].used) {
+    return res.json({ success: false, error: 'invalid_or_used_key' });
+  }
+
+  // Mark key as used
+  db.keys[key].used = true;
+  db.keys[key].usedBy = nickname;
+  db.keys[key].usedAt = new Date().toISOString();
+
+  // Create user
+  db.users[nickname] = {
+    nickname: nickname,
+    key: key,
+    createdAt: new Date().toISOString(),
+    lastSeen: new Date().toISOString(),
+    linksCreated: 0
+  };
+
+  saveData();
+  console.log(`[AUTH] New user registered: ${nickname} (key: ${key})`);
+  res.json({ success: true, role: 'user', nickname: nickname });
+});
+
+// ── API: Admin — get all users ────────────────────────────
+app.post('/api/admin/users', (req, res) => {
+  if (req.body.adminKey !== ADMIN_KEY) return res.status(403).json({ error: 'not_admin' });
+
+  const users = Object.values(db.users).map(u => ({
+    ...u,
+    totalClicks: Object.values(db.links)
+      .filter(l => l.createdBy === u.nickname)
+      .reduce((acc, l) => acc + (l.clicks || 0), 0)
+  }));
+  res.json({ success: true, users });
+});
+
+// ── API: Admin — rename user ──────────────────────────────
+app.post('/api/admin/rename', (req, res) => {
+  const { adminKey, oldNickname, newNickname } = req.body;
+  if (adminKey !== ADMIN_KEY) return res.status(403).json({ error: 'not_admin' });
+
+  if (!db.users[oldNickname]) return res.json({ success: false, error: 'user_not_found' });
+
+  // Rename
+  const user = db.users[oldNickname];
+  user.nickname = newNickname;
+  db.users[newNickname] = user;
+  delete db.users[oldNickname];
+
+  // Update key reference
+  if (db.keys[user.key]) db.keys[user.key].usedBy = newNickname;
+
+  // Update link references
+  Object.values(db.links).forEach(l => {
+    if (l.createdBy === oldNickname) l.createdBy = newNickname;
+  });
+
+  saveData();
+  console.log(`[ADMIN] Renamed user: ${oldNickname} → ${newNickname}`);
+  res.json({ success: true });
+});
+
+// ── API: Admin — list all keys ────────────────────────────
+app.post('/api/admin/keys', (req, res) => {
+  if (req.body.adminKey !== ADMIN_KEY) return res.status(403).json({ error: 'not_admin' });
+  res.json({ success: true, keys: db.keys, adminKey: ADMIN_KEY });
+});
+
+// ── API: Admin — generate more keys ──────────────────────
+app.post('/api/admin/generate-keys', (req, res) => {
+  if (req.body.adminKey !== ADMIN_KEY) return res.status(403).json({ error: 'not_admin' });
+  const count = req.body.count || 10;
+  const newKeys = generateKeys(count);
+  Object.assign(db.keys, newKeys);
+  saveData();
+  console.log(`[ADMIN] Generated ${count} new keys`);
+  res.json({ success: true, newKeys: Object.keys(newKeys) });
+});
+
+// ── API: Admin — all links with user info ─────────────────
+app.post('/api/admin/links', (req, res) => {
+  if (req.body.adminKey !== ADMIN_KEY) return res.status(403).json({ error: 'not_admin' });
+  const links = Object.values(db.links).map(l => ({
+    ...l,
+    visitors_count: (db.visitors[l.id] || []).length
+  }));
+  res.json({ success: true, links });
+});
+
 // ── API: Create tracking link ─────────────────────────────
 app.post('/api/create-link', (req, res) => {
   const destination = req.body.destination || 'https://standoff2.com';
-  const id = crypto.randomBytes(4).toString('hex'); // 8-char hex ID
+  const linkType = req.body.linkType || 'browser-promo';
+  const createdBy = req.body.nickname || 'unknown';
+  const id = crypto.randomBytes(4).toString('hex');
 
   db.links[id] = {
     id: id,
     destination: destination,
+    linkType: linkType,
+    createdBy: createdBy,
     created: new Date().toISOString(),
     clicks: 0
   };
   db.visitors[id] = [];
+
+  // Increment user's link count
+  if (db.users[createdBy]) {
+    db.users[createdBy].linksCreated++;
+    db.users[createdBy].lastSeen = new Date().toISOString();
+  }
+
   saveData();
 
-  // The tracking URL on public host (Render / Custom Domain)
   const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
   const host = req.headers['x-forwarded-host'] || req.get('host');
   const trackUrl = `${proto}://${host}/${id}`;
 
-  console.log(`[TRACK] Created link: ${trackUrl} -> ${destination}`);
+  console.log(`[TRACK] ${createdBy} created ${linkType}: ${trackUrl} -> ${destination}`);
 
   res.json({
     success: true,
     url: trackUrl,
     logger_id: id,
-    destination: destination
+    destination: destination,
+    linkType: linkType
   });
 });
 

