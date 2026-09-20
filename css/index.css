@@ -1,24 +1,57 @@
 @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
 
-:root {
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #111111;
-  --bg-card: #1a1a1a;
-  --bg-input: #0d0d0d;
-  --accent-red: #ff0033;
-  --accent-red-dark: #cc0029;
-  --accent-red-glow: rgba(255, 0, 51, 0.3);
-  --accent-green: #00ff41;
-  --accent-cyan: #00d4ff;
-  --text-primary: #e0e0e0;
-  --text-secondary: #999999;
-  --text-dim: #555555;
-  --text-yellow: #ffd400;
-  --danger: #ff0040;
-  --border-color: #222222;
-  --border-glow: rgba(255, 0, 51, 0.15);
+/* ═══════════════════════════════════════
+   THEME DEFINITIONS: GHOST (Default) & NEON SHADOW
+   ═══════════════════════════════════════ */
+
+:root, [data-theme="ghost"] {
+  --bg-primary: #0a0b0d;
+  --bg-secondary: #12141a;
+  --bg-card: #1a1d26;
+  --bg-input: #0d0e12;
+  --accent-primary: #38bdf8;
+  --accent-primary-dark: #0284c7;
+  --accent-primary-glow: rgba(56, 189, 248, 0.25);
+  --accent-red: #38bdf8;
+  --accent-red-dark: #0284c7;
+  --accent-red-glow: rgba(56, 189, 248, 0.25);
+  --accent-green: #34d399;
+  --accent-cyan: #38bdf8;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-dim: #64748b;
+  --text-yellow: #fbbf24;
+  --danger: #f43f5e;
+  --border-color: #242835;
+  --border-glow: rgba(56, 189, 248, 0.15);
+  --btn-main-bg: #ffffff;
+  --btn-main-text: #050505;
   --font-ui: 'Rajdhani', sans-serif;
   --font-mono: 'Share Tech Mono', monospace;
+}
+
+[data-theme="neon"] {
+  --bg-primary: #08050e;
+  --bg-secondary: #100b1a;
+  --bg-card: #1a0e30;
+  --bg-input: #0d0717;
+  --accent-primary: #c026d3;
+  --accent-primary-dark: #9333ea;
+  --accent-primary-glow: rgba(192, 38, 211, 0.35);
+  --accent-red: #c026d3;
+  --accent-red-dark: #9333ea;
+  --accent-red-glow: rgba(192, 38, 211, 0.35);
+  --accent-green: #22c55e;
+  --accent-cyan: #e879f9;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-dim: #8b5cf6;
+  --text-yellow: #fde047;
+  --danger: #f43f5e;
+  --border-color: #3b1d5c;
+  --border-glow: rgba(192, 38, 211, 0.2);
+  --btn-main-bg: linear-gradient(135deg, #a855f7, #c026d3);
+  --btn-main-text: #ffffff;
 }
 
 *, *::before, *::after {

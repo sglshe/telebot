@@ -1,4 +1,4 @@
-const CACHE_NAME = 'antichrist-v5.1.0';
+const CACHE_NAME = 'antichrist-v6.0.0';
 const ASSETS = [
   '/',
   '/index.html',
